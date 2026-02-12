@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIG / SMALL – Smooth Demo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Orbitron', Arial, sans-serif;
+}
+body{
+    background:#000;
+    height:100vh;
+    overflow:hidden;
+}
+
+/* CLEAR BACKGROUND SITE */
+.bg-site{
+    position:fixed;
+    inset:0;
+    z-index:1;
+}
+.bg-site iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* SMOOTH FLOATING BUTTON */
+.floating-btn{
+    position:fixed;
+    right:20px;
+    bottom:30px;
+    width:65px;
+    height:65px;
+    background:radial-gradient(circle,#ff3333,#b30000);
+    border-radius:50%;
+    box-shadow:0 0 25px #ff0000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:24px;
+    font-weight:bold;
+    cursor:pointer;
+    z-index:9999;
+    transition:transform 0.2s ease;
+    touch-action:none;
+}
+.floating-btn:active{
+    transform:scale(0.9);
+}
+
+/* POPUP */
+.popup{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9998;
+}
+.hidden{display:none;}
+
+.box{
+    width:300px;
+    background:#0f0000;
+    border-radius:14px;
+    border:2px solid #ff1a1a;
+    box-shadow:0 0 25px #ff0000;
+    overflow:hidden;
+}
+
+/* HEADER */
+.header{
+    background:#ff0000;
+    color:#fff;
+    padding:10px;
+    text-align:center;
+    position:relative;
+}
+.header span{
+    position:absolute;
+    right:10px;
+    top:6px;
+    cursor:pointer;
+}
+
+/* RESULT */
+.result{
+    margin:12px;
+    background:#000;
+    color:#fff;
+    padding:10px;
+    text-align:center;
+    border-radius:8px;
+    font-size:14px;
+}
+
+/* BIG / SMALL */
+.outcome{
+    margin:12px;
+    height:75px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+    font-weight:bold;
+}
+.big{
+    background:#003300;
+    color:#00ff00;
+    text-shadow:0 0 15px #00ff00;
+}
+.small{
+    background:#330000;
+    color:#ff3333;
+    text-shadow:0 0 15px #ff3333;
+}
+
+/* TIMER */
+.timer{
+    margin:8px 12px;
+    background:#2b0000;
+    color:#ffcc00;
+    text-align:center;
+    padding:8px;
+    border-radius:6px;
+}
+
+/* BUTTONS */
+.actions{
+    display:flex;
+    gap:8px;
+    padding:12px;
+}
+.btn{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    text-align:center;
+    color:#fff;
+    cursor:pointer;
+}
+.hide{background:#00bfff;}
+.exit{background:#ff0000;}
+</style>
+</head>
+
+<body>
+
+<div class="bg-site">
+    <iframe src="https://8rajagames.com/#/register?invitationCode=441275248353"></iframe>
+</div>
+
+<div class="floating-btn" id="floatBtn">⚡</div>
+
+<div class="popup hidden" id="popup">
+    <div class="box">
+        <div class="header">
+            RAJA GAMES
+            <span onclick="closePopup()">✕</span>
+        </div>
+
+        <div class="result">RESULT</div>
+        <div class="outcome big" id="outcome">BIG</div>
+        <div class="timer" id="timer">00 : 60</div>
+
+        <div class="actions">
+            <div class="btn hide" onclick="hidePopup()">HIDE</div>
+            <div class="btn exit" onclick="closePopup()">EXIT</div>
+        </div>
+    </div>
+</div>
+
+<script>
+let time = 60;
+const timerEl = document.getElementById("timer");
+const outcomeEl = document.getElementById("outcome");
+const popup = document.getElementById("popup");
+const floatBtn = document.getElementById("floatBtn");
+
+function randomResult(){
+    const res = Math.random() < 0.5 ? "BIG" : "SMALL";
+    outcomeEl.textContent = res;
+    outcomeEl.className = "outcome " + (res === "BIG" ? "big" : "small");
+}
+
+setInterval(()=>{
+    time--;
+    if(time <= 0){
+        time = 60;
+        randomResult();
+    }
+    timerEl.textContent = "00 : " + (time < 10 ? "0"+time : time);
+},1000);
+
+/* OPEN / CLOSE */
+floatBtn.onclick = ()=>{
+    popup.classList.remove("hidden");
+    floatBtn.style.display="none";
+};
+function closePopup(){
+    popup.classList.add("hidden");
+    floatBtn.style.display="flex";
+}
+function hidePopup(){
+    popup.classList.add("hidden");
+    setTimeout(()=>popup.classList.remove("hidden"),3000);
+}
+
+/* DRAG FUNCTION (SMOOTH MOBILE SUPPORT) */
+let isDragging = false;
+let offsetX, offsetY;
+
+floatBtn.addEventListener("pointerdown", e=>{
+    isDragging = true;
+    offsetX = e.clientX - floatBtn.getBoundingClientRect().left;
+    offsetY = e.clientY - floatBtn.getBoundingClientRect().top;
+    floatBtn.setPointerCapture(e.pointerId);
+});
+
+floatBtn.addEventListener("pointermove", e=>{
+    if(!isDragging) return;
+    floatBtn.style.left = (e.clientX - offsetX) + "px";
+    floatBtn.style.top = (e.clientY - offsetY) + "px";
+    floatBtn.style.right = "auto";
+    floatBtn.style.bottom = "auto";
+});
+
+floatBtn.addEventListener("pointerup", ()=>{
+    isDragging = false;
+});
+</script>
+
+</body>
+</html>
